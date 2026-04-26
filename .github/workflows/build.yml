@@ -42,7 +42,12 @@ jobs:
       - name: Compilar usuarios-service
         working-directory: usuarios-service
         run: mvn clean package -DskipTests
-
+      
+      - name: Instalar dependencias del runner
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unzip wget
+      
       - name: Instalar SonarScanner
         run: |
           wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.2.1.4610-linux-x64.zip
