@@ -1,0 +1,38 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: usuarios
+          uri: lb://usuarios-service
+          predicates:
+            - Path=/api/usuarios/**
+          filters:
+            - StripPrefix=1
+        - id: peliculas
+          uri: lb://peliculas-service
+          predicates:
+            - Path=/api/peliculas/**
+          filters:
+            - StripPrefix=1
+        - id: actores
+          uri: lb://peliculas-service
+          predicates:
+            - Path=/api/actores/**
+          filters:
+            - StripPrefix=1
+        - id: criticas
+          uri: lb://peliculas-service
+          predicates:
+            - Path=/api/criticas/**
+          filters:
+            - StripPrefix=1
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka

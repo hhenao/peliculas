@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="layout :: layout(~{::content})">
+
+<div th:fragment="content">
+
+    <h2 class="mb-3">Listado de Actores</h2>
+
+    <a href="/actores/crear" class="btn btn-success mb-3">Nuevo Actor</a>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-primary">
+        <tr>
+            <th>Nombre</th>
+            <th>Fecha de nacimiento</th>
+            <th>País</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="a : ${actores}">
+            <td th:text="${a.nombre}"></td>
+            <td th:text="${a.fechaNacimiento}"></td>
+            <td th:text="${a.paisNacimiento}"></td>
+            <td>
+                <a th:href="@{/actores/editar/{id}(id=${a.actorId})}"
+                   class="btn btn-warning btn-sm">Editar</a>
+
+                <a th:href="@{/actores/eliminar/{id}(id=${a.actorId})}"
+                   class="btn btn-danger btn-sm"
+                   onclick="return confirm('¿Seguro que deseas eliminar?')">
+                    Eliminar
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+</html>

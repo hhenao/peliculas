@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="layout :: layout(~{::body})">
+
+<body>
+
+<h2 th:text="${pelicula.idPelicula == null ? 'Nueva Película' : 'Editar Película'}"></h2>
+
+<form th:action="@{${accion}}"
+      th:object="${pelicula}"
+      method="post"
+      enctype="multipart/form-data">
+
+    <div class="row">
+        <div class="col-md-8">
+
+            <div class="mb-3">
+                <label class="form-label">Título</label>
+                <input class="form-control" th:field="*{titulo}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Año</label>
+                <input type="number" class="form-control" th:field="*{anio}">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Duración (minutos)</label>
+                <input type="number" class="form-control" th:field="*{duracion}">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">País</label>
+                <input class="form-control" th:field="*{pais}">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Dirección</label>
+                <input class="form-control" th:field="*{direccion}">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Género</label>
+                <input class="form-control" th:field="*{genero}">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Sinopsis</label>
+                <textarea class="form-control" rows="4" th:field="*{sinopsis}"></textarea>
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="mb-3">
+                <label class="form-label">Imagen de portada</label>
+                <input type="file" class="form-control" name="archivoImagen">
+            </div>
+
+            <div th:if="${pelicula.imagenPortada != null}">
+                <img th:src="@{'/img/peliculas/' + ${pelicula.imagenPortada}}"
+                     class="img-fluid mt-2 rounded shadow">
+            </div>
+
+        </div>
+    </div>
+
+    <button class="btn btn-primary mt-3"
+            th:text="${pelicula.idPelicula == null} ? 'Guardar' : 'Actualizar'">
+    </button>
+
+    <a href="/peliculas/listar" class="btn btn-secondary mt-3">Cancelar</a>
+
+</form>
+
+<!-- ================================================= -->
+<!-- MENSAJE CUANDO ES NUEVA PELÍCULA -->
+<!-- ================================================= -->
+
+<div th:if="${pelicula.idPelicula == null}" class="mt-4 alert alert-info">
+    Guarda la película primero para poder asociar actores.
+</div>
+
+<!-- ================================================= -->
+<!-- GESTIÓN DE ACTORES (SOLO SI EXISTE LA PELÍCULA) -->
+<!-- ================================================= -->
+
+<div th:if="${pelicula.idPelicula != null}">
+
+    <hr class="my-4">
+    <h4>Gestión de Actores</h4>
+
+    <!-- ============================= -->
+    <!-- ASOCIAR ACTOR -->
+    <!-- ============================= -->
+
+    <form th:action="@{/peliculas/{id}/asociar(id=${pelicula.idPelicula})}"
+          method="post"
+          class="d-flex mb-3">
+
+        <select id="actorSelect"
+                name="actorId"
+                class="form-select me-2"
+                required>
+
+            <option value="">Seleccione un actor</option>
+
+            <option th:each="a : ${actores}"
+                    th:if="${pelicula.actors == null
+                        or !pelicula.actors.contains(a)}"
+                    th:value="${a.actorId}"
+                    th:text="${a.nombre}">
+            </option>
+
+        </select>
+
+        <button id="btnAsociar"
+                type="submit"
+                class="btn btn-success">
+            Asociar
+        </button>
+
+    </form>
+
+    <!-- ============================= -->
+    <!-- ACTORES ASOCIADOS -->
+    <!-- ============================= -->
+
+    <table class="table table-bordered table-striped table-sm">
+        <thead class="table-dark">
+        <tr>
+            <th>Nombre</th>
+            <th style="width:130px;">Acción</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <tr th:each="a : ${pelicula.actors}">
+            <td th:text="${a.nombre}"></td>
+
+            <td>
+                <form th:action="@{/peliculas/{id}/eliminarActor(id=${pelicula.idPelicula})}"
+                      method="post"
+                      onsubmit="return confirm('¿Desea eliminar este actor?');">
+
+                    <input type="hidden"
+                           name="actorId"
+                           th:value="${a.actorId}" />
+
+                    <button type="submit"
+                            class="btn btn-danger btn-sm w-100">
+                        Eliminar
+                    </button>
+                </form>
+            </td>
+        </tr>
+
+        <tr th:if="${pelicula.actors == null
+                or pelicula.actors.isEmpty()}">
+            <td colspan="2" class="text-center text-muted">
+                No hay actores asociados
+            </td>
+        </tr>
+
+        </tbody>
+    </table>
+
+    <!-- ============================= -->
+    <!-- SCRIPT SOLO EN EDICIÓN -->
+    <!-- ============================= -->
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            const select = document.getElementById("actorSelect");
+            const button = document.getElementById("btnAsociar");
+
+            if (select && button) {
+
+                button.disabled = true;
+
+                select.addEventListener("change", function() {
+                    const selectedValue = select.value;
+                    button.disabled = !selectedValue;
+                });
+
+            }
+
+        });
+    </script>
+
+</div>
+
+</body>
+</html>

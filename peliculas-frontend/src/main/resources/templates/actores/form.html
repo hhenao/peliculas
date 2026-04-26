@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="layout :: layout(~{::body})">
+
+<body>
+
+<h2 th:text="${actor.actorId == null ? 'Nuevo Actor' : 'Editar Actor'}"></h2>
+
+<!-- FORMULARIO PARA CREAR -->
+<form th:if="${actor.actorId == null}"
+      th:action="@{/actores/guardar}"
+      th:object="${actor}"
+      method="post">
+
+    <div class="mb-3">
+        <label class="form-label">Nombre</label>
+        <input class="form-control" th:field="*{nombre}" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Fecha de nacimiento</label>
+        <input type="date" class="form-control" th:field="*{fechaNacimiento}">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">País</label>
+        <input class="form-control" th:field="*{paisNacimiento}">
+    </div>
+
+    <button class="btn btn-primary mt-2">Guardar</button>
+    <a href="/actores/listar" class="btn btn-secondary mt-2">Cancelar</a>
+
+</form>
+
+
+<!-- FORMULARIO PARA EDITAR -->
+<form th:if="${actor.actorId != null}"
+      th:action="@{/actores/actualizar/{id}(id=${actor.actorId})}"
+      th:object="${actor}"
+      method="post">
+
+    <input type="hidden" th:field="*{actorId}" />
+
+    <div class="mb-3">
+        <label class="form-label">Nombre</label>
+        <input class="form-control" th:field="*{nombre}" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Fecha de nacimiento</label>
+        <input type="date" class="form-control" th:field="*{fechaNacimiento}">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">País</label>
+        <input class="form-control" th:field="*{paisNacimiento}">
+    </div>
+
+    <button class="btn btn-primary mt-2">Actualizar</button>
+    <a href="/actores/listar" class="btn btn-secondary mt-2">Cancelar</a>
+
+</form>
+
+
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="layout :: layout(~{::body})">
+
+<body>
+
+<h2 class="mb-4" style="font-weight: bold;">Películas</h2>
+
+<!-- Formulario de búsqueda -->
+<form action="/peliculas/buscar" method="get" class="row g-2 mb-4 align-items-end">
+
+    <div class="col-md-3">
+        <input type="text"
+               name="titulo"
+               class="form-control"
+               placeholder="Título"
+               th:value="${param.titulo}">
+    </div>
+
+    <div class="col-md-3">
+        <input type="text"
+               name="genero"
+               class="form-control"
+               placeholder="Género"
+               th:value="${param.genero}">
+    </div>
+
+    <div class="col-md-3">
+        <input type="text"
+               name="actor"
+               class="form-control"
+               placeholder="Actor"
+               th:value="${param.actor}">
+    </div>
+
+    <div class="col-md-3 d-flex">
+        <button type="submit" class="btn btn-primary me-2">Buscar</button>
+        <a href="/peliculas/listar" class="btn btn-secondary">Limpiar</a>
+    </div>
+
+</form>
+
+
+<div class="d-flex justify-content-end mb-3"
+     sec:authorize="hasRole('ADMIN')">
+
+    <a href="/peliculas/crear"
+       class="btn btn-success">
+        + Nueva Película
+    </a>
+
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4" th:each="p : ${peliculas}">
+        <div class="card h-100 shadow-sm">
+
+            <img th:if="${p.imagenPortada != null}"
+                 th:src="@{'/img/peliculas/' + ${p.imagenPortada}}"
+                 class="card-img-top"
+                 style="height: 350px; object-fit: cover;">
+
+            <img th:if="${p.imagenPortada == null}"
+                 src="/img/no-image.png"
+                 class="card-img-top"
+                 style="height: 350px; object-fit: cover;">
+
+
+            <div class="card-body">
+                <h5 class="card-title" th:text="${p.titulo}"></h5>
+
+                <p class="card-text text-muted">
+                    <span th:text="${p.anio}"></span> ·
+                    <span th:text="${p.genero}"></span>
+                </p>
+
+                <div class="d-flex justify-content-between">
+                    <a th:href="@{/peliculas/ficha/{id}(id=${p.idPelicula})}"
+                       class="btn btn-outline-primary btn-sm">Ver</a>
+
+                    <a sec:authorize="hasRole('ADMIN')" th:href="@{/peliculas/editar/{id}(id=${p.idPelicula})}"
+                       class="btn btn-outline-warning btn-sm">Editar</a>
+
+                    <a sec:authorize="hasRole('ADMIN')" th:href="@{/peliculas/eliminar/{id}(id=${p.idPelicula})}"
+                       onclick="return confirm('¿Seguro?')"
+                       class="btn btn-outline-danger btn-sm">Eliminar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>

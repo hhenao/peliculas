@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout :: layout(~{::body})}">
+
+<body>
+
+<h2 class="mb-4 fw-bold">Gestión de Usuarios</h2>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div th:if="${success}" class="alert alert-success">
+            <span th:text="${success}"></span>
+        </div>
+
+        <div th:if="${error}" class="alert alert-danger">
+            <span th:text="${error}"></span>
+        </div>
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Rol</th>
+                <th class="text-center">Acciones</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="u : ${usuarios}">
+                <td th:text="${u.adminId}"></td>
+                <td th:text="${u.username}"></td>
+
+                <td>
+                    <span th:if="${u.role == 'ADMIN'}"
+                          class="badge bg-danger">
+                        ADMIN
+                    </span>
+
+                    <span th:if="${u.role == 'USER'}"
+                          class="badge bg-primary">
+                        USER
+                    </span>
+                </td>
+
+                <td class="text-center">
+
+                    <!-- Editar -->
+                    <a th:if="${u.username != 'ADMIN'}"
+                            th:href="@{'/usuarios/editar/' + ${u.adminId}}"
+                       class="btn btn-warning btn-sm me-2">
+                        Editar
+                    </a>
+
+                    <!-- Eliminar -->
+                    <form th:if="${u.username != 'ADMIN'}"
+                          th:action="@{'/usuarios/eliminar/' + ${u.adminId}}"
+                          method="post"
+                          style="display:inline;">
+                        <button type="submit"
+                                class="btn btn-danger btn-sm"
+                                onclick="return confirm('¿Seguro que desea eliminar este usuario?')">
+                            Eliminar
+                        </button>
+                    </form>
+
+                </td>
+            </tr>
+            </tbody>
+
+        </table>
+
+    </div>
+</div>
+
+</body>
+</html>

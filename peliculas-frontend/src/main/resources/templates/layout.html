@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:fragment="layout(content)">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>TOP Pelis UAH</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Estilo propio -->
+    <link rel="stylesheet" th:href="@{/css/film.css}">
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-faff">
+    <div class="container">
+
+        <a class="navbar-brand" href="/">TOP Pelis UAH</a>
+
+        <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+
+            <ul class="navbar-nav me-auto">
+                <!-- Películas: USER y ADMIN -->
+                <li class="nav-item"
+                    sec:authorize="hasAnyRole('USER','ADMIN')">
+                    <a class="nav-link" href="/peliculas/listar">Películas</a>
+                </li>
+
+                <!-- Actores: solo ADMIN -->
+                <li class="nav-item"
+                    sec:authorize="hasRole('ADMIN')">
+                    <a class="nav-link" href="/actores/listar">Actores</a>
+                </li>
+
+                <li class="nav-item"
+                    sec:authorize="hasRole('ADMIN')">
+                    <a class="nav-link" href="/usuarios/listar">Usuarios</a>
+                </li>
+            </ul>
+
+            <!-- Login / Registro / Salir -->
+            <ul class="navbar-nav">
+                <li class="nav-item"
+                    th:if="${#authentication == null or #authentication.principal == 'anonymousUser'}">
+                    <a class="nav-link" th:href="@{/login}">Iniciar sesión</a>
+                </li>
+                <li class="nav-item"
+                    th:if="${#authentication == null or #authentication.principal == 'anonymousUser'}">
+                    <a class="nav-link" th:href="@{/register}">Registrarse</a>
+                </li>
+                <li class="nav-item"
+                    th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+                    <a class="nav-link">
+                        Bienvenido,<strong sec:authentication="name"></strong>
+                    </a>
+                </li>
+                <li class="nav-item"
+                    th:if="${#authentication != null && #authentication.principal != 'anonymousUser'}">
+                    <a class="nav-link" href="/logout">Salir</a>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <!-- aquí va el contenido de cada página -->
+    <div th:replace="${content}"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

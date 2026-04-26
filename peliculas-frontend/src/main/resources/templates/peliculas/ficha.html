@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="layout :: layout(~{::body})">
+
+<body>
+
+<div class="row align-items-start">
+
+    <div class="col-md-4 text-center">
+        <img th:if="${pelicula.imagenPortada != null}"
+             th:src="@{'/img/peliculas/' + ${pelicula.imagenPortada}}"
+             class="img-fluid rounded shadow">
+
+        <img th:if="${pelicula.imagenPortada == null}"
+             src="/img/peliculas/no-image.png"
+             class="img-fluid rounded shadow">
+    </div>
+
+    <div class="col-md-8">
+        <h1 class="mb-3 fw-bold" th:text="${pelicula.titulo}"></h1>
+
+        <ul class="list-group list-group-flush mb-3">
+            <li class="list-group-item"><strong>Año:</strong> <span th:text="${pelicula.anio}"></span></li>
+            <li class="list-group-item"><strong>Duración:</strong> <span th:text="${pelicula.duracion}"></span> min</li>
+            <li class="list-group-item"><strong>País:</strong> <span th:text="${pelicula.pais}"></span></li>
+            <li class="list-group-item"><strong>Dirección:</strong> <span th:text="${pelicula.direccion}"></span></li>
+            <li class="list-group-item"><strong>Género:</strong> <span th:text="${pelicula.genero}"></span></li>
+        </ul>
+
+        <h5 class="fw-bold">Reparto</h5>
+        <div th:if="${pelicula.actors != null and !pelicula.actors.isEmpty()}">
+            <ul>
+                <li th:each="a : ${pelicula.actors}"
+                    th:text="${a.nombre}">
+                </li>
+            </ul>
+        </div>
+
+        <h5 class="fw-bold">Sinopsis</h5>
+        <p th:text="${pelicula.sinopsis}"></p>
+
+        <hr class="my-4">
+
+        <h4 class="fw-bold">Críticas</h4>
+
+        <!-- NOTA MEDIA -->
+        <div class="mb-3">
+            <strong>Nota media:</strong>
+            <span th:text="${#numbers.formatDecimal(notaMedia, 1, 2)}"></span>
+        </div>
+
+        <!-- LISTADO DE CRÍTICAS -->
+        <div th:if="${criticas != null and !criticas.isEmpty()}">
+
+            <div th:each="critica : ${criticas}" class="card mb-3 shadow-sm">
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <strong th:text="${critica.username}"></strong>
+                            <strong>Nota:</strong>
+                            <span class="badge bg-primary"
+                                  th:text="${critica.nota}"></span>
+                        </div>
+
+                        <small class="text-muted"
+                               th:text="${critica.fecha}"></small>
+                    </div>
+
+                    <p class="mt-2"
+                       th:text="${critica.descripcion}"></p>
+
+                    <!-- BOTÓN ELIMINAR SOLO ADMIN -->
+                    <div sec:authorize="hasRole('ADMIN')">
+                        <form th:action="@{'/peliculas/' + ${pelicula.idPelicula} + '/criticas/eliminar/' + ${critica.id}}"
+                              method="post">
+
+                            <input type="hidden"
+                                   name="peliculaId"
+                                   th:value="${pelicula.idPelicula}" />
+
+                            <button type="submit"
+                                    class="btn btn-sm btn-danger">
+                                Eliminar
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${criticas == null or criticas.isEmpty()}">
+            <p class="text-muted">No hay críticas todavía.</p>
+        </div>
+
+        <!-- FORMULARIO SOLO USER -->
+        <div sec:authorize="hasRole('USER')" class="mt-4">
+            <hr>
+            <h5>Agregar crítica</h5>
+            <div th:if="${errorCritica != null}"
+                 class="alert alert-danger mt-3">
+                <span th:text="${errorCritica}"></span>
+            </div>
+            <form th:action="@{'/peliculas/' + ${pelicula.idPelicula} + '/critica'}"
+                  method="post">
+
+                <div class="mb-3">
+                    <label class="form-label">Nota (1-10)</label>
+                    <input type="number"
+                           name="nota"
+                           min="1"
+                           max="10"
+                           class="form-control"
+                           required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Descripción</label>
+                    <textarea name="descripcion"
+                              class="form-control"
+                              rows="3"
+                              required></textarea>
+                </div>
+
+                <button type="submit"
+                        class="btn btn-success">
+                    Publicar crítica
+                </button>
+            </form>
+        </div>
+
+
+        <a href="/peliculas/listar" class="btn btn-outline-secondary mt-3">Volver</a>
+    </div>
+
+</div>
+
+
+</body>
+</html>

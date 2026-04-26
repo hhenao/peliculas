@@ -1,0 +1,19 @@
+server:
+  port: 0
+
+spring:
+  application:
+    name: usuarios-service
+  datasource:
+    url: jdbc:mysql://localhost:3306/peliculasdb
+    username: root
+    password: b5ba43e5e4+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
