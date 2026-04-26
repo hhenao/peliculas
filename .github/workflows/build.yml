@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 env:
@@ -40,14 +43,20 @@ jobs:
         working-directory: usuarios-service
         run: mvn clean package -DskipTests
 
+      - name: Instalar SonarScanner
+        run: |
+          wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.2.1.4610-linux-x64.zip
+          unzip -q sonar-scanner-cli-6.2.1.4610-linux-x64.zip
+          echo "$PWD/sonar-scanner-6.2.1.4610-linux-x64/bin" >> $GITHUB_PATH
+
       - name: Analizar codigo con SonarQube
         run: |
-          mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+          sonar-scanner \
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
             -Dsonar.projectKey=peliculas \
             -Dsonar.projectName=peliculas \
-            -Dsonar.qualitygate.wait=true \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.projectVersion=1.0 \
             -Dsonar.sources=api-gateway/src,eureka-server/src,peliculas-service/src,usuarios-service/src,peliculas-frontend \
             -Dsonar.java.binaries=api-gateway/target/classes,eureka-server/target/classes,peliculas-service/target/classes,usuarios-service/target/classes \
             -Dsonar.exclusions=**/target/**,**/src/test/**,**/.git/** \
