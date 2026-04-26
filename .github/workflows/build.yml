@@ -27,6 +27,13 @@ jobs:
           java-version: "17"
           distribution: "temurin"
 
+      - name: Verificar Java
+        run: |
+          echo "JAVA_HOME=$JAVA_HOME"
+          ls -la "$JAVA_HOME/bin/java"
+          "$JAVA_HOME/bin/java" -version
+          echo "$JAVA_HOME/bin" >> $GITHUB_PATH
+
       - name: Compilar api-gateway
         working-directory: api-gateway
         run: mvn clean package -DskipTests
@@ -49,9 +56,13 @@ jobs:
           jar xf sonar-scanner-cli-7.2.0.5079-linux-x64.zip
           chmod +x sonar-scanner-7.2.0.5079-linux-x64/bin/sonar-scanner
           echo "$PWD/sonar-scanner-7.2.0.5079-linux-x64/bin" >> $GITHUB_PATH
-      
+
       - name: Analizar codigo con SonarQube
         run: |
+          export PATH="$JAVA_HOME/bin:$PATH"
+
+          java -version
+
           sonar-scanner \
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
             -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
