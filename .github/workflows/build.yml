@@ -47,8 +47,9 @@ jobs:
         run: |
           wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-7.2.0.5079-linux-x64.zip
           jar xf sonar-scanner-cli-7.2.0.5079-linux-x64.zip
+          chmod +x sonar-scanner-7.2.0.5079-linux-x64/bin/sonar-scanner
           echo "$PWD/sonar-scanner-7.2.0.5079-linux-x64/bin" >> $GITHUB_PATH
-
+      
       - name: Analizar codigo con SonarQube
         run: |
           sonar-scanner \
