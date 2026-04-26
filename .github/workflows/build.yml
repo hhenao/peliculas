@@ -68,7 +68,7 @@ jobs:
 
           sonar-scanner \
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
-            -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
             -Dsonar.projectKey=peliculas \
             -Dsonar.projectName=peliculas \
             -Dsonar.projectVersion=1.0 \
