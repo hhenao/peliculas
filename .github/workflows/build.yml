@@ -1,38 +1,51 @@
-name: Build
+name: Analisis SonarQube
 
 on:
   push:
     branches:
       - main
-
+  workflow_dispatch:
 
 jobs:
-  build:
-    name: Build
-    runs-on: ubuntu-latest
+  sonar:
+    name: Revisar codigo con SonarQube
+    runs-on: self-hosted
+
     steps:
-      - uses: actions/checkout@v2
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar JDK 17
+        uses: actions/setup-java@v4
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - name: Set up JDK 11
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
-      - name: Cache SonarQube packages
-        uses: actions/cache@v1
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-      - name: Cache Maven packages
-        uses: actions/cache@v1
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
-      - name: Build and analyze
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=peliculas
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Compilar api-gateway
+        working-directory: api-gateway
+        run: mvn clean package -DskipTests
+
+      - name: Compilar eureka-server
+        working-directory: eureka-server
+        run: mvn clean package -DskipTests
+
+      - name: Compilar peliculas-service
+        working-directory: peliculas-service
+        run: mvn clean package -DskipTests
+
+      - name: Compilar usuarios-service
+        working-directory: usuarios-service
+        run: mvn clean package -DskipTests
+
+      - name: Analizar codigo con SonarQube
+        run: |
+          mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+            -Dsonar.projectKey=peliculas \
+            -Dsonar.projectName=peliculas \
+            -Dsonar.qualitygate.wait=true \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.sources=api-gateway/src,eureka-server/src,peliculas-service/src,usuarios-service/src,peliculas-frontend \
+            -Dsonar.java.binaries=api-gateway/target/classes,eureka-server/target/classes,peliculas-service/target/classes,usuarios-service/target/classes \
+            -Dsonar.exclusions=**/target/**,**/src/test/**,**/.git/** \
+            -Dsonar.coverage.exclusions=**/model/**/*.java,**/dto/**/*.java
